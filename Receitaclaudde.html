@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receita Médica - GHC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .config-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .config-section {
+            margin-bottom: 20px;
+        }
+
+        .config-section h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 5px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn {
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background: #45a049;
+        }
+
+        .btn-secondary {
+            background: #2196f3;
+        }
+
+        .btn-secondary:hover {
+            background: #1976d2;
+        }
+
+        .prescription-container {
+            background: white;
+            width: 297mm;
+            height: 210mm;
+            margin: 0 auto;
+            display: flex;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .via {
+            flex: 1;
+            padding: 15mm;
+            border-right: 1px dashed #ccc;
+            position: relative;
+        }
+
+        .via:last-child {
+            border-right: none;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4caf50;
+            padding-bottom: 10px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(135deg, #8bc34a, #4caf50, #2e7d32);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .hospital-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .via-label {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .doctor-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .doctor-info .doctor-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .doctor-info .doctor-details {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .patient-info {
+            background: #f0f8ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #b3d9ff;
+        }
+
+        .patient-info .label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .patient-info .value {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+            border-bottom: 1px dotted #ccc;
+            min-height: 20px;
+            margin-bottom: 8px;
+        }
+
+        .prescription-box {
+            border: 2px solid #4caf50;
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 200px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+
+        .prescription-title {
+            background: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            margin: -15px -15px 15px -15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .medication {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .medication-use {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 5px;
+        }
+
+        .medication-name {
+            font-size: 13px;
+            color: #333;
+            margin-left: 20px;
+            margin-bottom: 3px;
+        }
+
+        .medication-dosage {
+            font-size: 12px;
+            color: #666;
+            margin-left: 40px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 15mm;
+            left: 15mm;
+            right: 15mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+        }
+
+        .date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .signature-area {
+            text-align: center;
+        }
+
+        .signature-line {
+            width: 200px;
+            border-top: 1px solid #333;
+            margin-bottom: 5px;
+        }
+
+        .doctor-signature {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .medication-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .autocomplete-item:hover {
+            background: #f5f5f5;
+        }
+
+        .medication-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .config-panel {
+                display: none;
+            }
+            
+            .prescription-container {
+                box-shadow: none;
+                margin: 0;
+            }
+            
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="config-panel">
+        <div class="config-section">
+            <h3>Configuração do Médico</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>CRM:</label>
+                    <input type="text" id="crm" placeholder="Digite o CRM">
+                </div>
+                <div class="form-group">
+                    <label>Nome do Médico:</label>
+                    <input type="text" id="doctorName" placeholder="Nome completo">
+                </div>
+                <div class="form-group">
+                    <label>Especialidade:</label>
+                    <input type="text" id="specialty" placeholder="Especialidade médica">
+                </div>
+            </div>
+            <button class="btn" onclick="saveDoctorData()">Salvar Médico</button>
+            <button class="btn btn-secondary" onclick="loadDoctorByCRM()">Carregar por CRM</button>
+        </div>
+
+        <div class="config-section">
+            <h3>Configuração de Medicamentos</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Princípio Ativo:</label>
+                    <input type="text" id="activePrinciple" placeholder="Nome do princípio ativo">
+                </div>
+                <div class="form-group">
+                    <label>Concentração/Dose:</label>
+                    <input type="text" id="concentration" placeholder="Ex: 500mg">
+                </div>
+                <div class="form-group">
+                    <label>Posologia Padrão:</label>
+                    <input type="text" id="standardDosage" placeholder="Ex: 1 comprimido a cada 8 horas">
+                </div>
+            </div>
+            <button class="btn" onclick="saveMedicationData()">Salvar Medicamento</button>
+        </div>
+
+        <div class="config-section">
+            <h3>Dados do Paciente</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome do Paciente:</label>
+                    <input type="text" id="patientName" placeholder="Nome completo">
+                </div>
+                <div class="form-group">
+                    <label>Endereço:</label>
+                    <input type="text" id="patientAddress" placeholder="Endereço completo">
+                </div>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <h3>Prescrição</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Uso:</label>
+                    <select id="medicationUse">
+                        <option value="Uso Interno">Uso Interno</option>
+                        <option value="Uso Externo">Uso Externo</option>
+                        <option value="Uso Oftálmico">Uso Oftálmico</option>
+                        <option value="Uso Tópico">Uso Tópico</option>
+                    </select>
+                </div>
+                <div class="form-group autocomplete-container">
+                    <label>Princípio Ativo:</label>
+                    <input type="text" id="searchMedication" placeholder="Digite 4 letras para buscar..." oninput="searchMedications(this.value)">
+                    <div class="autocomplete-list" id="medicationList"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Posologia:</label>
+                    <input type="text" id="dosageInstructions" placeholder="Ex: 1 comprimido a cada 8 horas">
+                </div>
+                <div class="form-group">
+                    <label>Duração (dias):</label>
+                    <input type="number" id="treatmentDays" placeholder="Número de dias" onchange="calculateTotalPills()">
+                </div>
+            </div>
+            <button class="btn" onclick="addMedication()">Adicionar Medicamento</button>
+        </div>
+
+        <div class="form-row">
+            <button class="btn" onclick="generatePrescription()">Gerar Receita</button>
+            <button class="btn btn-secondary" onclick="printPrescription()">Imprimir</button>
+        </div>
+    </div>
+
+    <div class="prescription-container" id="prescriptionContainer">
+        <!-- 1ª Via -->
+        <div class="via">
+            <div class="via-label">1ª VIA - FARMÁCIA</div>
+            <div class="header">
+                <div class="logo">GHC</div>
+                <div class="header-info">
+                    <div class="hospital-name">GRUPO HOSPITALAR CONCEIÇÃO</div>
+                    <div class="subtitle">Hospital Nossa Senhora da Conceição</div>
+                    <div class="subtitle">RECEITUÁRIO - Controle Especial</div>
+                </div>
+            </div>
+
+            <div class="doctor-info">
+                <div class="doctor-name" id="displayDoctorName1">Dr. [Nome do Médico]</div>
+                <div class="doctor-details">
+                    <strong>CRM:</strong> <span id="displayCRM1">[CRM]</span> | 
+                    <strong>Especialidade:</strong> <span id="displaySpecialty1">[Especialidade]</span>
+                </div>
+            </div>
+
+            <div class="patient-info">
+                <div class="label">Paciente:</div>
+                <div class="value" id="displayPatientName1"></div>
+                <div class="label">Endereço:</div>
+                <div class="value" id="displayPatientAddress1"></div>
+            </div>
+
+            <div class="prescription-box">
+                <div class="prescription-title">PRESCRIÇÃO</div>
+                <div class="medication-list" id="medicationList1"></div>
+            </div>
+
+            <div class="footer">
+                <div class="date" id="displayDate1"></div>
+                <div class="signature-area">
+                    <div class="signature-line"></div>
+                    <div class="doctor-signature">
+                        <span id="footerDoctorName1">[Nome do Médico]</span><br>
+                        CRM: <span id="footerCRM1">[CRM]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2ª Via -->
+        <div class="via">
+            <div class="via-label">2ª VIA - PACIENTE</div>
+            <div class="header">
+                <div class="logo">GHC</div>
+                <div class="header-info">
+                    <div class="hospital-name">GRUPO HOSPITALAR CONCEIÇÃO</div>
+                    <div class="subtitle">Hospital Nossa Senhora da Conceição</div>
+                    <div class="subtitle">RECEITUÁRIO - Controle Especial</div>
+                </div>
+            </div>
+
+            <div class="doctor-info">
+                <div class="doctor-name" id="displayDoctorName2">Dr. [Nome do Médico]</div>
+                <div class="doctor-details">
+                    <strong>CRM:</strong> <span id="displayCRM2">[CRM]</span> | 
+                    <strong>Especialidade:</strong> <span id="displaySpecialty2">[Especialidade]</span>
+                </div>
+            </div>
+
+            <div class="patient-info">
+                <div class="label">Paciente:</div>
+                <div class="value" id="displayPatientName2"></div>
+                <div class="label">Endereço:</div>
+                <div class="value" id="displayPatientAddress2"></div>
+            </div>
+
+            <div class="prescription-box">
+                <div class="prescription-title">PRESCRIÇÃO</div>
+                <div class="medication-list" id="medicationList2"></div>
+            </div>
+
+            <div class="footer">
+                <div class="date" id="displayDate2"></div>
+                <div class="signature-area">
+                    <div class="signature-line"></div>
+                    <div class="doctor-signature">
+                        <span id="footerDoctorName2">[Nome do Médico]</span><br>
+                        CRM: <span id="footerCRM2">[CRM]</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de dados em memória
+        let doctorsDB = {};
+        let medicationsDB = {};
+        let currentMedications = [];
+
+        // Inicializar com alguns dados de exemplo
+        function initializeDefaultData() {
+            // Médicos de exemplo
+            doctorsDB['12345'] = {
+                name: 'Dr. João Silva',
+                specialty: 'Cardiologia',
+                crm: '12345'
+            };
+            
+            doctorsDB['67890'] = {
+                name: 'Dra. Maria Santos',
+                specialty: 'Clínica Geral',
+                crm: '67890'
+            };
+
+            // Medicamentos de exemplo
+            medicationsDB['para'] = {
+                name: 'Paracetamol',
+                concentration: '500mg',
+                dosage: '1 comprimido a cada 6 horas'
+            };
+            
+            medicationsDB['amox'] = {
+                name: 'Amoxicilina',
+                concentration: '875mg',
+                dosage: '1 comprimido a cada 12 horas'
+            };
+            
+            medicationsDB['dipl'] = {
+                name: 'Dipirona',
+                concentration: '500mg',
+                dosage: '1 comprimido a cada 8 horas'
+            };
+            
+            medicationsDB['ibup'] = {
+                name: 'Ibuprofeno',
+                concentration: '600mg',
+                dosage: '1 comprimido a cada 8 horas'
+            };
+        }
+
+        // Salvar dados do médico
+        function saveDoctorData() {
+            const crm = document.getElementById('crm').value;
+            const name = document.getElementById('doctorName').value;
+            const specialty = document.getElementById('specialty').value;
+
+            if (crm && name && specialty) {
+                doctorsDB[crm] = { name, specialty, crm };
+                alert('Dados do médico salvos com sucesso!');
+                loadDoctorData(crm);
+            } else {
+                alert('Preencha todos os campos do médico!');
+            }
+        }
+
+        // Carregar médico por CRM
+        function loadDoctorByCRM() {
+            const crm = document.getElementById('crm').value;
+            if (crm && doctorsDB[crm]) {
+                loadDoctorData(crm);
+            } else {
+                alert('CRM não encontrado no banco de dados!');
+            }
+        }
+
+        // Carregar dados do médico
+        function loadDoctorData(crm) {
+            const doctor = doctorsDB[crm];
+            if (doctor) {
+                document.getElementById('doctorName').value = doctor.name;
+                document.getElementById('specialty').value = doctor.specialty;
+            }
+        }
+
+        // Salvar dados do medicamento
+        function saveMedicationData() {
+            const principle = document.getElementById('activePrinciple').value.toLowerCase();
+            const concentration = document.getElementById('concentration').value;
+            const dosage = document.getElementById('standardDosage').value;
+
+            if (principle && concentration && dosage) {
+                const key = principle.substring(0, 4);
+                medicationsDB[key] = {
+                    name: document.getElementById('activePrinciple').value,
+                    concentration,
+                    dosage
+                };
+                alert('Medicamento salvo com sucesso!');
+                
+                // Limpar campos
+                document.getElementById('activePrinciple').value = '';
+                document.getElementById('concentration').value = '';
+                document.getElementById('standardDosage').value = '';
+            } else {
+                alert('Preencha todos os campos do medicamento!');
+            }
+        }
+
+        // Buscar medicamentos
+        function searchMedications(query) {
+            const list = document.getElementById('medicationList');
+            list.innerHTML = '';
+            
+            if (query.length >= 4) {
+                const key = query.toLowerCase().substring(0, 4);
+                if (medicationsDB[key]) {
+                    const med = medicationsDB[key];
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.innerHTML = `${med.name} ${med.concentration}`;
+                    item.onclick = () => selectMedication(med);
+                    list.appendChild(item);
+                    list.style.display = 'block';
+                } else {
+                    list.style.display = 'none';
+                }
+            } else {
+                list.style.display = 'none';
+            }
+        }
+
+        // Selecionar medicamento
+        function selectMedication(med) {
+            document.getElementById('searchMedication').value = `${med.name} ${med.concentration}`;
+            document.getElementById('dosageInstructions').value = med.dosage;
+            document.getElementById('medicationList').style.display = 'none';
+            calculateTotalPills();
+        }
+
+        // Calcular total de comprimidos
+        function calculateTotalPills() {
+            const dosage = document.getElementById('dosageInstructions').value;
+            const days = parseInt(document.getElementById('treatmentDays').value) || 0;
+            
+            // Extrair número de comprimidos por dose (assumindo formato "X comprimido(s)")
+            const match = dosage.match(/(\d+)\s*comprimido/i);
+            if (match && days > 0) {
+                const pillsPerDose = parseInt(match[1]);
+                const dosesPerDay = dosage.includes('8 horas') ? 3 : 
+                                  dosage.includes('12 horas') ? 2 : 
+                                  dosage.includes('6 horas') ? 4 : 1;
+                
+                const totalPills = pillsPerDose * dosesPerDay * days;
+                // Você pode usar este valor para exibir o total
+            }
+        }
+
+        // Adicionar medicamento à lista
+        function addMedication() {
+            const use = document.getElementById('medicationUse').value;
+            const medication = document.getElementById('searchMedication').value;
+            const dosage = document.getElementById('dosageInstructions').value;
+            const days = document.getElementById('treatmentDays').value;
+
+            if (medication && dosage && days) {
+                // Calcular total de comprimidos
+                const match = dosage.match(/(\d+)\s*comprimido/i);
+                let totalPills = '';
+                if (match) {
+                    const pillsPerDose = parseInt(match[1]);
+                    const dosesPerDay = dosage.includes('8 horas') ? 3 : 
+                                      dosage.includes('12 horas') ? 2 : 
+                                      dosage.includes('6 horas') ? 4 : 1;
+                    totalPills = pillsPerDose * dosesPerDay * parseInt(days);
+                }
+
+                const medicationObj = {
+                    use,
+                    medication,
+                    dosage,
+                    days,
+                    totalPills
+                };
+
+                currentMedications.push(medicationObj);
+                
+                // Limpar campos
+                document.getElementById('searchMedication').value = '';
+                document.getElementById('dosageInstructions').value = '';
+                document.getElementById('treatmentDays').value = '';
+                
+                updateMedicationDisplay();
+            } else {
+                alert('Preencha todos os campos da prescrição!');
+            }
+        }
+
+        // Atualizar exibição dos medicamentos
+        function updateMedicationDisplay() {
+            const list1 = document.getElementById('medicationList1');
+            const list2 = document.getElementById('medicationList2');
+            
+            let html = '';
+            currentMedications.forEach((med, index) => {
+                html += `
+                    <div class="medication">
+                        <div class="medication-use">${med.use}</div>
+                        <div class="medication-name">${med.medication} ${med.totalPills ? `- ${med.totalPills} comprimidos` : ''}</div>
+                        <div class="medication-dosage">${med.dosage}</div>
+                        <div class="medication-dosage">${med.days} dias</div>
+                    </div>
+                `;
+            });
+            
+            list1.innerHTML = html;
+            list2.innerHTML = html;
+        }
+
+        // Gerar receita
+        function generatePrescription() {
+            const doctorName = document.getElementById('doctorName').value;
+            const crm = document.getElementById('crm').value;
+            const specialty = document.getElementById('specialty').value;
+            const patientName = document.getElementById('patientName').value;
+            const patientAddress = document.getElementById('patientAddress').value;
+
+            if (!doctorName || !crm || !specialty) {
+                alert('Preencha os dados do médico!');
+                return;
+            }
+
+            // Atualizar dados do médico
+            ['1', '2'].forEach(via => {
+                document.getElementById(`displayDoctorName${via}`).textContent = doctorName;
+                document.getElementById(`displayCRM${via}`).textContent = crm;
+                document.getElementById(`displaySpecialty${via}`).textContent = specialty;
+                document.getElementById(`footerDoctorName${via}`).textContent = doctorName;
+                document.getElementById(`footerCRM${via}`).textContent = crm;
+            });
+
+            // Atualizar dados do paciente
+            ['1', '2'].forEach(via => {
+                document.getElementById(`displayPatientName${via}`).textContent = patientName || '[Nome do Paciente]';
+                document.getElementById(`displayPatientAddress${via}`).textContent = patientAddress || '[Endereço]';
+            });
+
+            // Atualizar data
+            const today = new Date().toLocaleDateString('pt-BR');
+            ['1', '2'].forEach(via => {
+                document.getElementById(`displayDate${via}`).textContent = today;
+            });
+
+            updateMedicationDisplay();
+            alert('Receita gerada com sucesso!');
+        }
+
+        // Imprimir receita
+        function printPrescription() {
+            window.print();
+        }
+
+        // Inicializar dados padrão
+        initializeDefaultData();
+
+        // Fechar lista de autocomplete ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-container')) {
+                document.getElementById('medicationList').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
