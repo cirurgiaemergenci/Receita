@@ -1,0 +1,22 @@
+{
+  "12345": {
+    "name": "Dr. João Silva",
+    "specialty": "Cardiologia",
+    "crm": "12345"
+  },
+  "22846": {
+    "name": "Dr. \tGEMERSON GABIATTI",
+    "specialty": "Cirurgia Geral e do Trauma",
+    "crm": "22846"
+  },
+  "32860": {
+    "name": "Dr. Mauricio Graciolli",
+    "specialty": "Cirurgia Geral e do Trauma",
+    "crm": "32860"
+  },
+  "67890": {
+    "name": "Dra. Maria Santos",
+    "specialty": "Clínica Geral",
+    "crm": "67890"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "para": {
+    "name": "Paracetamol",
+    "concentration": "500mg",
+    "dosage": "Tomar 1 comprimido a cada 6 horas"
+  },
+  "amox": {
+    "name": "Amoxicilina",
+    "concentration": "875mg",
+    "dosage": "Tomar 1 comprimido a cada 12 horas"
+  },
+  "dipi": {
+    "name": "Dipirona",
+    "concentration": "500mg",
+    "dosage": "Tomar 1 comprimido a cada 6 horas"
+  },
+  "ibup": {
+    "name": "Ibuprofeno",
+    "concentration": "600mg",
+    "dosage": "Tomar 1 comprimido a cada 6 horas"
+  },
+  "tans": {
+    "name": "Tansulosina ",
+    "concentration": "0,4 mg",
+    "dosage": "Tomar 1 comprimido Via oral à noite"
+  },
+  "piro": {
+    "name": "Piroxican",
+    "concentration": "20 mg",
+    "dosage": "Tomar 1 Comprimido Ao dia após refeição "
+  }
+}
