@@ -12,3 +12,143 @@ O modelo ficou ótimo mas queria mais próximo deste padrão. Sem salvar o nome 
 
 
 Preciso do redimensionamento da receita final ocupando toda a folha A4 com 2 bancos de dados editáveis para os dados dos médicos e para os dados dos princípios ativos e posologia. Do banco de dados digitada as 4 primeiras letras do princípio ativo ele completa o medicamento e a posologia e preenchimento automático do número total de comprimidos.
+
+
+
+PROMPT  DE BANCO DE DADOS
+
+# Prompt para Copilot: Sistema de Receitas Médicas com Banco de Dados Local
+
+## Contexto
+Você precisa modificar o sistema de receitas médicas HTML/JavaScript existente para incluir funcionalidades de banco de dados local com sincronização em nuvem.
+
+## Requisitos Principais
+
+### 1. Banco de Dados Local
+- **Implementar IndexedDB** para armazenamento persistente no navegador
+- **Estrutura de dados:**
+  - Tabela `medicos`: CRM, nome, especialidade, data_cadastro
+  - Tabela `medicamentos`: id, nome, concentracao, posologia, data_atualizacao
+  - Tabela `receitas`: id, crm_medico, paciente, medicamentos, data_emissao
+  - Tabela `configuracoes`: ultima_sync_medicamentos, ultima_sync_receitas
+
+### 2. Sistema de Sincronização
+- **Medicamentos**: Atualização automática 3x por semana (segunda, quarta, sexta)
+- **Receitas**: Download automático na primeira execução + upload 3x por semana
+- **URLs configuráveis** para GitHub/nuvem
+- **Fallback offline** quando não há conexão
+
+### 3. Interface de Gerenciamento
+Adicionar nova seção "Gerenciamento de Dados" com botões:
+- 🔄 "Sincronizar Medicamentos Agora"
+- 📥 "Baixar Dicionário de Receitas"
+- 📤 "Fazer Backup dos Dados"
+- 🗑️ "Limpar Cache Local"
+- ⚙️ "Configurar URLs de Sincronização"
+- 📊 "Ver Status da Sincronização"
+
+### 4. Funcionalidades Específicas
+
+#### Inicialização Automática:
+```javascript
+// Ao carregar a página:
+1. Verificar se existe banco local
+2. Se não existir, criar estrutura inicial
+3. Baixar dicionário de medicamentos e receitas
+4. Configurar timers de sincronização automática
+```
+
+#### Sistema de Logs:
+- Log de todas as receitas emitidas
+- Histórico de sincronizações
+- Backup automático dos dados locais
+
+#### Configuração de URLs:
+```javascript
+const CONFIG_URLS = {
+    medicamentos: 'https://raw.githubusercontent.com/usuario/repo/main/medicamentos.json',
+    receitas: 'https://raw.githubusercontent.com/usuario/repo/main/receitas_template.json',
+    backup: 'endpoint-para-backup'
+};
+```
+
+### 5. Melhorias na Interface
+
+#### Autocomplete Avançado:
+- Busca por nome comercial e princípio ativo
+- Sugestões baseadas em histórico
+- Cache inteligente de buscas frequentes
+
+#### Histórico de Receitas:
+- Lista das últimas receitas emitidas
+- Possibilidade de reimprimir
+- Estatísticas de uso
+
+#### Indicadores Visuais:
+- Status de conectividade (🟢 online / 🔴 offline)
+- Data da última sincronização
+- Contador de receitas no cache local
+
+### 6. Compatibilidade Multiplataforma
+- **Funcionamento em qualquer navegador moderno**
+- **Não depende de Python ou Node.js**
+- **Arquivo HTML único e portátil**
+- **Armazenamento 100% local com IndexedDB**
+
+### 7. Estrutura de Arquivos na Nuvem
+```
+repositorio/
+├── medicamentos.json          # Base completa de medicamentos
+├── receitas_template.json     # Templates de receitas comuns
+├── updates/
+│   ├── medicamentos_update.json
+│   └── changelog.json
+└── backup/
+    └── [backups opcionais]
+```
+
+### 8. Tratamento de Erros
+- **Retry automático** em falhas de rede
+- **Modo offline** com dados em cache
+- **Validação de integridade** dos dados baixados
+- **Notificações amigáveis** ao usuário
+
+## Implementação Técnica Sugerida
+
+### IndexedDB Setup:
+```javascript
+// Estrutura do banco de dados
+const DB_NAME = 'ReceitasMedicasDB';
+const DB_VERSION = 1;
+const STORES = ['medicos', 'medicamentos', 'receitas', 'configuracoes'];
+```
+
+### Sistema de Sincronização:
+```javascript
+// Verificar e executar sync automático
+function setupAutoSync() {
+    // Verificar se é hora de sincronizar (seg/qua/sex)
+    // Executar download/upload conforme necessário
+    // Agendar próxima verificação
+}
+```
+
+### Melhorias na UX:
+- **Progress bars** durante sincronização
+- **Toasts/notifications** para feedback
+- **Modal de configurações** mais intuitivo
+- **Indicadores de status** sempre visíveis
+
+## Resultado Esperado
+Um sistema completo que funciona offline, sincroniza automaticamente dados da nuvem, mantém histórico local e pode ser usado em qualquer computador sem instalação de dependências adicionais.
+
+## Instruções Adicionais
+- Manter **compatibilidade total** com o código existente
+- **Progressivamente aprimorar** sem quebrar funcionalidades atuais
+- Implementar **verificações de segurança** nos dados baixados
+- Criar **documentação inline** para facilitar manutenção
+- Usar **padrões web modernos** mas com boa compatibilidade
+
+---
+
+**Nota**: O sistema deve ser robusto o suficiente para funcionar mesmo em ambientes com conectividade limitada, priorizando sempre a experiência offline com sincronização inteligente em background.
