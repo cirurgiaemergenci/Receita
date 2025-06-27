@@ -19,14 +19,9 @@
     "concentration": "600mg",
     "dosage": "1 comprimido a cada 6 horas"
   },
-  "tans": {
-    "name": "Tansulosina",
-    "concentration": "0,4 mg",
-    "dosage": "Tomar 1 Comprimido Via Oral à noite"
-  },
-  "piro": {
-    "name": "Piroxican",
-    "concentration": "20 mg",
-    "dosage": "Tomar 1 Comprimido pós alimentação "
+  "dicl": {
+    "name": "Diclofenaco",
+    "concentration": "50 mg",
+    "dosage": "Tomar 1 Comprimido"
   }
 }
