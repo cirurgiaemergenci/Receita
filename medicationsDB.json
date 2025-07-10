@@ -28,5 +28,10 @@
     "name": "Piroxican",
     "concentration": "20 mg",
     "dosage": "Tomar 1 Comprimido Ao dia após refeição "
+  },
+  "cipr": {
+    "name": "Ciprofloxacino",
+    "concentration": "500 mg",
+    "dosage": "Tomar 1 comprimido Via Oral de 12 em 12 horas"
   }
 }
