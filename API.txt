@@ -1,1 +1,2 @@
-Google Gemini API Key: YOUR_API_KEY_HERE
+gemini
+YOUR_API_KEY_HERE
