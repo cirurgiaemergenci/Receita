@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receituário - Fundação Hospital Centenário</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+
+        /* Estilos do Painel de Configuração */
+        .config-panel {
+            background: white; padding: 20px; border-radius: 8px;
+            margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .config-section { margin-bottom: 20px; }
+        .config-section h3 {
+            color: #333; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px;
+        }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
+        .form-group input, .form-group select {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+        }
+        .btn {
+            background: #333; color: white; padding: 10px 20px; border: none;
+            border-radius: 4px; cursor: pointer; margin-right: 10px; font-weight: bold;
+        }
+        .btn:hover { background: #555; }
+        .btn-secondary { background: #666; }
+        .btn-secondary:hover { background: #888; }
+        .btn-danger { background: #d32f2f; }
+        .btn-warning { background: #f57c00; color: white; }
+        .btn-warning:hover { background: #e65100; }
+
+        /* Autocomplete */
+        .autocomplete-container { position: relative; }
+        .autocomplete-list {
+            position: absolute; top: 100%; left: 0; right: 0; background: white;
+            border: 1px solid #ddd; max-height: 200px; overflow-y: auto; z-index: 1000; display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .autocomplete-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; text-transform: capitalize; }
+        .autocomplete-item:hover { background: #f5f5f5; }
+        .autocomplete-free { color: #2e7d32; background: #e8f5e9; } 
+
+        /* Notificação de Status */
+        #dbStatus { font-size: 12px; margin-top: 5px; display: inline-block; padding: 3px 8px; border-radius: 4px; }
+        .status-ok { background: #c8e6c9; color: #2e7d32; }
+        .status-error { background: #ffcdd2; color: #c62828; }
+
+        /* Estilos da Folha de Impressão */
+        .prescription-container {
+            background: white; margin: 0 auto; display: flex; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative;
+        }
+
+        .layout-paisagem { width: 297mm; height: 210mm; flex-direction: row; }
+
+        /* Estrutura das Vias */
+        .via {
+            flex: 1; padding: 10mm 15mm; position: relative; display: flex; flex-direction: column;
+            border-right: 1px dashed #ccc; width: 50%; height: 100%; overflow: hidden;
+        }
+        .via:last-child { border-right: none; }
+        .via-label-tag { position: absolute; top: 10px; right: 15px; font-size: 10px; font-weight: bold; color: #666; }
+
+        /* Cabeçalho */
+        .header-especial { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; }
+        .header-especial h1 { font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .title-especial { text-align: center; font-size: 14px; font-weight: bold; margin: 5px 0 10px 0; }
+        
+        .top-boxes { display: flex; gap: 10px; margin-bottom: 10px; }
+        .box-eminente { border: 1px solid #000; padding: 6px; width: 50%; font-size: 9px; line-height: 1.3; }
+        .box-vias { width: 50%; padding: 6px; font-size: 9px; line-height: 1.3; }
+        .carimbo-area { border-top: 1px solid #000; margin-top: 20px; text-align: center; padding-top: 5px; font-size: 9px;}
+
+        /* Área do Paciente e Prescrição */
+        .patient-area { margin-bottom: 10px; line-height: 1.4; font-size: 13px;}
+        .patient-line { display: flex; align-items: flex-end; margin-bottom: 3px; }
+        .patient-line span { margin-right: 10px; font-weight: bold; }
+        .line-fill { flex: 1; border-bottom: 1px solid #000; min-height: 16px; }
+
+        .prescription-content { flex: 1; padding: 5px 0; overflow: hidden; }
+        .med-item { margin-bottom: 10px; }
+        .med-uso { font-weight: bold; text-decoration: underline; margin-bottom: 6px; font-size: 12px; }
+        
+        /* LINHA PONTILHADA E FORMATAÇÃO */
+        .med-header-flex { display: flex; align-items: flex-end; margin-bottom: 2px; margin-left: 10px; }
+        .med-nome { font-weight: bold; font-size: 13px; text-transform: capitalize; }
+        .med-dots { flex-grow: 1; border-bottom: 2px dotted #666; margin: 0 10px; position: relative; top: -3px; }
+        .med-qtd { font-size: 13px; font-weight: bold; white-space: nowrap; }
+        
+        .med-posologia { margin-left: 30px; font-size: 11px; text-align: justify; line-height: 1.2; }
+
+        /* Rodapé Comum */
+        .assinatura-comum { display: flex; justify-content: space-between; margin-bottom: 15px; margin-top: 20px; }
+        .linha-ass { width: 180px; border-top: 1px solid #000; text-align: center; padding-top: 5px; font-size: 11px; }
+
+        /* Rodapé Controle Especial */
+        .bottom-boxes-especial { display: flex; gap: 10px; margin-top: auto; }
+        .box-comprador, .box-fornecedor { border: 1px solid #000; padding: 6px; width: 50%; font-size: 9px; }
+        .box-title { text-align: center; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid #ccc; padding-bottom: 3px;}
+        .input-line { display: flex; align-items: flex-end; margin-bottom: 5px; }
+        .input-line span { margin-right: 5px; }
+        .input-line .line { flex: 1; border-bottom: 1px dashed #000; height: 10px; }
+
+        @media print {
+            @page { size: A4 landscape; margin: 0; }
+            body, html { width: 100%; height: 100%; margin: 0; padding: 0; background: white; }
+            .config-panel { display: none !important; }
+            
+            .prescription-container { 
+                width: 297mm !important; 
+                height: 209mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important; 
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="config-panel">
+        <div class="config-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Configuração da Prescrição</h3>
+                <span id="dbStatus">Carregando base de dados...</span>
+            </div>
+            <div class="form-row" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Tipo de Receituário:</label>
+                    <select id="tipoReceita" onchange="generatePrescription()">
+                        <option value="especial">Controle Especial (2 Vias - A4 Paisagem Inteira)</option>
+                        <option value="comum">Receituário Comum (1 Via - Metade A4 Paisagem)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome do Médico:</label>
+                    <input type="text" id="doctorName" placeholder="Dr(a). Seu Nome">
+                </div>
+                <div class="form-group">
+                    <label>CRM:</label>
+                    <input type="text" id="crm" placeholder="CRM-RS 00000">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome do Paciente:</label>
+                    <input type="text" id="patientName" placeholder="Nome completo do paciente">
+                </div>
+                <div class="form-group">
+                    <label>Endereço do Paciente:</label>
+                    <input type="text" id="patientAddress" placeholder="Endereço (opcional)">
+                </div>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <div class="form-row">
+                <div class="form-group" style="flex: 0.3;">
+                    <label>Uso:</label>
+                    <select id="medicationUse">
+                        <option value="Uso Interno">Uso Interno</option>
+                        <option value="Uso Externo">Uso Externo</option>
+                        <option value="Uso Contínuo">Uso Contínuo</option>
+                    </select>
+                </div>
+                <div class="form-group autocomplete-container">
+                    <label>Medicamento (Busca JSON ou Texto Livre):</label>
+                    <input type="text" id="searchMedication" placeholder="Digite a medicação..." oninput="searchMedications(this.value)">
+                    <div class="autocomplete-list" id="medicationList"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Posologia:</label>
+                    <input type="text" id="dosageInstructions" placeholder="Ex: Tomar 1 cp de 8/8h">
+                </div>
+                <div class="form-group" style="flex: 0.2;">
+                    <label>Dias de Tratamento:</label>
+                    <input type="number" id="medDays" placeholder="Ex: 5" min="1">
+                </div>
+            </div>
+            <button class="btn" onclick="addMedication()">+ Adicionar</button>
+            <button class="btn btn-danger" onclick="clearPrescription()">Limpar Tudo</button>
+        </div>
+
+        <div class="form-row" style="margin-top: 20px; border-top: 2px solid #ccc; padding-top: 20px; display: flex; align-items: center;">
+            <button class="btn" onclick="generatePrescription()" style="background: #2e7d32;">Visualizar Alterações</button>
+            <button class="btn btn-secondary" onclick="imprimir()">🖨️ Imprimir (Ctrl+P)</button>
+            
+            <button id="btnExportJSON" class="btn btn-warning" style="display: none; margin-left: auto;" onclick="downloadUpdatedJSON()">📥 Baixar medicationsDB.json Atualizado</button>
+        </div>
+    </div>
+
+    <div id="printArea" class="prescription-container layout-paisagem"></div>
+
+    <script>
+        const JSON_URL = 'https://raw.githubusercontent.com/cirurgiaemergenci/Receita/main/medicationsDB.json'; 
+        
+        let originalJSONDict = {}; // Armazena a estrutura original do dicionário do GitHub
+        let medicationsDB = [];    // Array para facilitar as buscas no JS
+        let currentMedications = [];
+        let exportableNewMeds = []; 
+
+        const fallbackDB = {
+            "ceft": { "name": 'Ceftriaxona', "concentration": '1g', "dosage": 'Aplicar 1 frasco-ampola IV/IM de 12/12 horas.' },
+            "dipi": { "name": 'Dipirona Sódica', "concentration": '500mg/ml', "dosage": 'Tomar 40 gotas via oral de 6/6 horas se dor.' }
+        };
+
+        async function initApp() {
+            const statusEl = document.getElementById('dbStatus');
+            try {
+                // Timestamp na URL para evitar cache e pegar sempre a última versão
+                const response = await fetch(JSON_URL + '?t=' + new Date().getTime());
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Salva a estrutura de dicionário original para depois podermos baixar ela atualizada
+                    if (!Array.isArray(data)) {
+                        originalJSONDict = data;
+                        medicationsDB = Object.values(data);
+                    } else {
+                        // Caso você acidentalmente suba uma lista no GitHub, o código arruma para um dicionário
+                        originalJSONDict = {};
+                        data.forEach((med, i) => originalJSONDict['med'+i] = med);
+                        medicationsDB = data;
+                    }
+                    
+                    statusEl.textContent = 'Base GitHub conectada (Online)';
+                    statusEl.className = 'status-ok';
+                } else {
+                    throw new Error('Falha HTTP');
+                }
+            } catch (error) {
+                console.warn("Erro ao buscar JSON. Usando Fallback local.", error);
+                originalJSONDict = fallbackDB;
+                medicationsDB = Object.values(fallbackDB);
+                statusEl.textContent = 'Usando Base Local (Modo Offline)';
+                statusEl.className = 'status-error';
+            }
+            generatePrescription(); 
+        }
+
+        window.onload = initApp;
+
+        function searchMedications(query) {
+            const list = document.getElementById('medicationList');
+            list.innerHTML = '';
+            
+            if (query.length >= 2) { 
+                const term = query.toLowerCase();
+                const results = medicationsDB.filter(med => 
+                    med.name && med.name.toLowerCase().includes(term) || 
+                    med.concentration && med.concentration.toLowerCase().includes(term)
+                );
+
+                if (results.length > 0) {
+                    results.forEach(med => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.innerHTML = `<strong>${med.name}</strong> ${med.concentration || ''}`;
+                        item.onclick = () => selectMedication(med.name, med.concentration, med.dosage);
+                        list.appendChild(item);
+                    });
+                } else {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item autocomplete-free';
+                    item.innerHTML = `<em>💡 Prescrição livre: <strong>${query}</strong></em>`;
+                    item.onclick = () => {
+                        document.getElementById('searchMedication').value = query;
+                        document.getElementById('medicationList').style.display = 'none';
+                        document.getElementById('dosageInstructions').focus();
+                    };
+                    list.appendChild(item);
+                }
+                list.style.display = 'block';
+            } else {
+                list.style.display = 'none';
+            }
+        }
+
+        function selectMedication(name, concentration, dosage) {
+            document.getElementById('searchMedication').value = `${name} ${concentration || ''}`.trim();
+            document.getElementById('dosageInstructions').value = dosage || '';
+            document.getElementById('medicationList').style.display = 'none';
+            document.getElementById('medDays').focus();
+        }
+
+        function addMedication() {
+            const use = document.getElementById('medicationUse').value;
+            const medName = document.getElementById('searchMedication').value;
+            const posologia = document.getElementById('dosageInstructions').value;
+            const dias = document.getElementById('medDays').value;
+
+            if (medName && posologia) {
+                currentMedications.push({ use, name: medName, posologia, dias });
+
+                const isKnown = medicationsDB.some(m => `${m.name} ${m.concentration || ''}`.toLowerCase().includes(medName.toLowerCase()));
+                
+                if (!isKnown) {
+                    exportableNewMeds.push({
+                        name: medName,
+                        concentration: "",
+                        dosage: posologia
+                    });
+                    document.getElementById('btnExportJSON').style.display = 'inline-block';
+                }
+
+                document.getElementById('searchMedication').value = '';
+                document.getElementById('dosageInstructions').value = '';
+                document.getElementById('medDays').value = '';
+                generatePrescription(); 
+            }
+        }
+
+        // Função de Update e Download
+        function downloadUpdatedJSON() {
+            if (exportableNewMeds.length === 0) return;
+
+            // Insere os medicamentos novos no dicionário original perfeitamente formatados
+            exportableNewMeds.forEach(med => {
+                let baseKey = med.name.substring(0, 4).toLowerCase().replace(/[^a-z]/g, '');
+                while(baseKey.length < 4) baseKey += 'x';
+                let uniqueKey = baseKey;
+                
+                // Garante que a chave de 4 letras não vá sobrescrever uma já existente
+                while(originalJSONDict[uniqueKey]) {
+                    uniqueKey = baseKey + Math.floor(Math.random() * 1000);
+                }
+
+                originalJSONDict[uniqueKey] = {
+                    name: med.name,
+                    concentration: med.concentration,
+                    dosage: med.dosage
+                };
+            });
+
+            // Converte o dicionário final para JSON formatado (com espaçamento)
+            const finalJSONString = JSON.stringify(originalJSONDict, null, 2);
+
+            // Cria um link temporário para forçar o download do arquivo
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(finalJSONString);
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "medicationsDB.json");
+            document.body.appendChild(downloadAnchorNode); // Necessário para o Firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+
+            alert("✅ Arquivo medicationsDB.json baixado!\n\nAgora vá no seu GitHub, clique em 'Add file' -> 'Upload files' e arraste este arquivo baixado para atualizar sua biblioteca.");
+            
+            // Limpa a lista temporária e esconde o botão
+            exportableNewMeds = [];
+            document.getElementById('btnExportJSON').style.display = 'none';
+        }
+
+        function clearPrescription() {
+            currentMedications = [];
+            generatePrescription();
+        }
+
+        function formatDate(date) {
+            const d = String(date.getDate()).padStart(2, '0');
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const y = date.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
+
+        function calculateTotalQuantity(posologia, dias, medName) {
+            if (!dias) return null;
+
+            let posLower = posologia.toLowerCase();
+            let dailyFreq = 1;
+            let dosePerIntake = 1;
+
+            if (posLower.includes('24/24') || posLower.includes('1x') || posLower.includes('1 vez') || posLower.includes('ao dia')) dailyFreq = 1;
+            else if (posLower.includes('12/12') || posLower.includes('2x') || posLower.includes('2 vezes') || posLower.includes('duas vezes')) dailyFreq = 2;
+            else if (posLower.includes('8/8') || posLower.includes('3x') || posLower.includes('3 vezes')) dailyFreq = 3;
+            else if (posLower.includes('6/6') || posLower.includes('4x') || posLower.includes('4 vezes')) dailyFreq = 4;
+            else if (posLower.includes('4/4') || posLower.includes('6x')) dailyFreq = 6;
+
+            let doseMatch = posLower.match(/(\d+)\s*(comp|cp|cápsula|cap|ampola|frasco|gota|colher|ml)/);
+            if (doseMatch) {
+                dosePerIntake = parseInt(doseMatch[1]);
+            }
+
+            let total = dosePerIntake * dailyFreq * parseInt(dias);
+            let unit = 'CP';
+            let nameLower = medName.toLowerCase();
+            
+            if (nameLower.includes('ml') || posLower.includes('frasco') || posLower.includes('gota') || posLower.includes('xarope')) {
+                unit = 'frasco(s)';
+                total = total > 100 ? 2 : 1; 
+            } else if (nameLower.includes('ampola') || posLower.includes('ampola')) {
+                unit = 'ampola(s)';
+            } else if (nameLower.includes('pomada') || nameLower.includes('creme')) {
+                unit = 'bisnaga(s)';
+                total = 1;
+            }
+
+            return `${total} ${unit}`;
+        }
+
+        function buildMedicationsHTML() {
+            let html = '';
+            let currentUse = '';
+            
+            currentMedications.forEach(med => {
+                if (med.use !== currentUse) {
+                    html += `<div class="med-uso">${med.use}</div>`;
+                    currentUse = med.use;
+                }
+
+                let finalQtdText = '';
+                if (med.dias) {
+                    finalQtdText = calculateTotalQuantity(med.posologia, med.dias, med.name);
+                } else {
+                    let unit = 'CP';
+                    let nameLower = med.name.toLowerCase();
+                    if (nameLower.includes('ml')) unit = 'frasco(s)';
+                    else if (nameLower.includes('ampola')) unit = 'ampola(s)';
+                    finalQtdText = unit;
+                }
+                
+                html += `
+                    <div class="med-item">
+                        <div class="med-header-flex">
+                            <span class="med-nome">${med.name}</span>
+                            <div class="med-dots"></div>
+                            <span class="med-qtd">${finalQtdText}</span>
+                        </div>
+                        <div class="med-posologia">${med.posologia}</div>
+                    </div>
+                `;
+            });
+            
+            for(let i=0; i < 2; i++){
+                 html += `<div style="border-bottom: 1px dotted #ccc; margin-top: 15px; height: 5px;"></div>`;
+            }
+            return html;
+        }
+
+        function generatePrescription() {
+            const tipo = document.getElementById('tipoReceita').value;
+            const printArea = document.getElementById('printArea');
+            
+            const pName = document.getElementById('patientName').value.toUpperCase() || '__________________________________________';
+            const pAddr = document.getElementById('patientAddress').value.toUpperCase() || '__________________________________________';
+            const docName = document.getElementById('doctorName').value || '_______________________';
+            const crm = document.getElementById('crm').value || '_______________';
+            const today = formatDate(new Date());
+            const medsHtml = buildMedicationsHTML();
+
+            printArea.className = "prescription-container layout-paisagem";
+
+            if (tipo === 'comum') {
+                printArea.innerHTML = `
+                    <div class="via">
+                        <div class="via-label-tag">RECEITUÁRIO COMUM</div>
+                        <div class="header-especial">
+                            <h1><span class="logo-placeholder" style="width:30px;height:30px;font-size:12px;margin-right:8px;">HC</span> FUNDAÇÃO HOSPITAL CENTENÁRIO</h1>
+                        </div>
+                        
+                        <div class="title-especial" style="font-size: 16px;">RECEITUÁRIO MÉDICO</div>
+
+                        <div class="patient-area" style="margin-top: 20px;">
+                            <div class="patient-line"><span>Paciente:</span><div class="line-fill" style="border-bottom: 1px solid #000;">${pName !== '__________________________________________' ? pName : ''}</div></div>
+                            <div class="patient-line"><span>Prescrição:</span></div>
+                        </div>
+
+                        <div class="prescription-content">
+                            ${medsHtml}
+                        </div>
+
+                        <div class="assinatura-comum" style="margin-top: auto; margin-bottom: 10px;">
+                            <div class="linha-ass" style="border: none; text-align: left;">
+                                Data: ${today}
+                            </div>
+                            <div class="linha-ass">
+                                ASSINATURA DO MÉDICO<br>${docName}<br>${crm}
+                            </div>
+                        </div>
+                        
+                        <div style="text-align:center; font-size: 9px; border-top: 1px solid #ccc; padding-top: 5px; color: #666;">
+                            Av. Theodomiro Porto da Fonseca, 799 - Fião, São Leopoldo - RS | Fone: (51) 3591-1400
+                        </div>
+                    </div>
+                    <div class="via" style="border-right: none;"></div>
+                `;
+            } else {
+                let viasHtml = '';
+                const labels = ['1º Via Branca/Retenção da Farmácia', '2º Via Amarela/Orientação do Paciente'];
+                
+                for(let i=0; i<2; i++) {
+                    viasHtml += `
+                    <div class="via">
+                        <div class="via-label-tag">${labels[i]}</div>
+                        <div class="header-especial">
+                            <h1><span class="logo-placeholder" style="width:30px;height:30px;font-size:12px;margin-right:8px;">HC</span> FUNDAÇÃO HOSPITAL CENTENÁRIO</h1>
+                        </div>
+                        
+                        <div class="title-especial">RECEITUÁRIO DE CONTROLE ESPECIAL</div>
+
+                        <div class="top-boxes">
+                            <div class="box-eminente">
+                                <strong>IDENTIFICAÇÃO DO EMINENTE</strong><br><br>
+                                FUNDAÇÃO HOSPITAL CENTENÁRIO<br><br>
+                                Av. Theodomiro Porto da Fonseca, 799<br>
+                                Bairro Fião, São Leopoldo - RS<br>
+                                Fone: (51) 3591-1400<br>
+                                CNPJ: 92.931.245/0001-50<br>
+                                CEP: 93.020-645
+                            </div>
+                            <div class="box-vias">
+                                <div class="carimbo-area">
+                                    CARIMBO DO MÉDICO<br><br>
+                                    ${docName}<br>${crm}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="patient-area">
+                            <div class="patient-line"><span>Paciente:</span><div class="line-fill" style="border-bottom: 1px solid #000;">${pName !== '__________________________________________' ? pName : ''}</div></div>
+                            <div class="patient-line"><span>Endereço:</span><div class="line-fill" style="border-bottom: 1px solid #000;">${pAddr !== '__________________________________________' ? pAddr : ''}</div></div>
+                            <div class="patient-line"><span>Prescrição:</span></div>
+                        </div>
+
+                        <div class="prescription-content">
+                            ${medsHtml}
+                        </div>
+
+                        <div class="assinatura-comum" style="margin-top: 5px; margin-bottom: 5px;">
+                            <div class="linha-ass" style="border: none; text-align: left;">
+                                Data: ${today}
+                            </div>
+                            <div class="linha-ass">
+                                ASSINATURA DO MÉDICO
+                            </div>
+                        </div>
+
+                        <div class="bottom-boxes-especial">
+                            <div class="box-comprador">
+                                <div class="box-title">IDENTIFICAÇÃO DO COMPRADOR</div>
+                                <div class="input-line"><span>Nome:</span><div class="line"></div></div>
+                                <div class="input-line"><span>Identidade:</span><div class="line"></div></div>
+                                <div class="input-line"><span>Órgão Emissor:</span><div class="line"></div></div>
+                                <div class="input-line"><span>Endereço:</span><div class="line"></div></div>
+                                <div style="display:flex; gap:10px;">
+                                    <div class="input-line" style="flex:2;"><span>Cidade:</span><div class="line"></div></div>
+                                    <div class="input-line" style="flex:1;"><span>UF:</span><div class="line"></div></div>
+                                </div>
+                                <div class="input-line"><span>Telefone:</span><div class="line"></div></div>
+                            </div>
+                            <div class="box-fornecedor">
+                                <div class="box-title">IDENTIFICAÇÃO DO FORNECEDOR</div>
+                                <br><br><br>
+                                <div style="display:flex; gap:5px; border-top: 1px solid #000; padding-top:3px; text-align:center;">
+                                    <div style="flex:2;">Assinatura Farmacêutico</div>
+                                    <div style="flex:1;">Data</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }
+                printArea.innerHTML = viasHtml;
+            }
+        }
+
+        function imprimir() {
+            generatePrescription(); 
+            setTimeout(() => window.print(), 100);
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-container')) {
+                document.getElementById('medicationList').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
