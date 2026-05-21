@@ -277,14 +277,6 @@
             color: #666;
         }
 
-        .medication-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
         .autocomplete-container {
             position: relative;
         }
@@ -346,8 +338,16 @@
             <h3>Configuração do Médico</h3>
             <div class="form-row">
                 <div class="form-group">
+                    <label>Seleção Rápida de Médico:</label>
+                    <select id="doctorSelect" onchange="selectDoctorFromDropdown(this.value)">
+                        <option value="">Selecione um médico cadastrado...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
                     <label>CRM:</label>
-                    <input type="text" id="crm" placeholder="Digite o CRM">
+                    <input type="text" id="crm" placeholder="Digite o CRM..." oninput="autoLoadDoctorByCRM(this.value)">
                 </div>
                 <div class="form-group">
                     <label>Nome do Médico:</label>
@@ -358,27 +358,7 @@
                     <input type="text" id="specialty" placeholder="Especialidade médica">
                 </div>
             </div>
-            <button class="btn" onclick="saveDoctorData()">Salvar Médico</button>
-            <button class="btn btn-secondary" onclick="loadDoctorByCRM()">Carregar por CRM</button>
-        </div>
-
-        <div class="config-section">
-            <h3>Configuração de Medicamentos</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Princípio Ativo:</label>
-                    <input type="text" id="activePrinciple" placeholder="Nome do princípio ativo">
-                </div>
-                <div class="form-group">
-                    <label>Concentração/Dose:</label>
-                    <input type="text" id="concentration" placeholder="Ex: 500mg">
-                </div>
-                <div class="form-group">
-                    <label>Posologia Padrão:</label>
-                    <input type="text" id="standardDosage" placeholder="Ex: 1 comprimido a cada 8 horas">
-                </div>
-            </div>
-            <button class="btn" onclick="saveMedicationData()">Salvar Medicamento</button>
+            <button class="btn" onclick="saveDoctorData()">Salvar/Atualizar Médico</button>
         </div>
 
         <div class="config-section">
@@ -408,8 +388,8 @@
                     </select>
                 </div>
                 <div class="form-group autocomplete-container">
-                    <label>Princípio Ativo:</label>
-                    <input type="text" id="searchMedication" placeholder="Digite 4 letras para buscar..." oninput="searchMedications(this.value)">
+                    <label>Princípio Ativo (Busca GitHub):</label>
+                    <input type="text" id="searchMedication" placeholder="Digite as primeiras letras..." oninput="searchMedications(this.value)">
                     <div class="autocomplete-list" id="medicationList"></div>
                 </div>
             </div>
@@ -420,7 +400,7 @@
                 </div>
                 <div class="form-group">
                     <label>Duração (dias):</label>
-                    <input type="number" id="treatmentDays" placeholder="Número de dias" onchange="calculateTotalPills()">
+                    <input type="number" id="treatmentDays" placeholder="Número de dias">
                 </div>
             </div>
             <button class="btn" onclick="addMedication()">Adicionar Medicamento</button>
@@ -433,7 +413,6 @@
     </div>
 
     <div class="prescription-container" id="prescriptionContainer">
-        <!-- 1ª Via -->
         <div class="via">
             <div class="via-label">1ª VIA - FARMÁCIA</div>
             <div class="header">
@@ -477,7 +456,6 @@
             </div>
         </div>
 
-        <!-- 2ª Via -->
         <div class="via">
             <div class="via-label">2ª VIA - PACIENTE</div>
             <div class="header">
@@ -515,7 +493,7 @@
                     <div class="signature-line"></div>
                     <div class="doctor-signature">
                         <span id="footerDoctorName2">[Nome do Médico]</span><br>
-                        CRM: <span id="footerCRM2">[CRM]</span>
+                        CRM: <span id="footerCRM1">[CRM]</span>
                     </div>
                 </div>
             </div>
@@ -523,124 +501,126 @@
     </div>
 
     <script>
-        // Banco de dados em memória
-        let doctorsDB = {};
+        let doctorsDB = JSON.parse(localStorage.getItem('doctorsDB')) || {};
         let medicationsDB = {};
         let currentMedications = [];
 
-        // Inicializar com alguns dados de exemplo
-        function initializeDefaultData() {
-            // Médicos de exemplo
-            doctorsDB['12345'] = {
-                name: 'Dr. João Silva',
-                specialty: 'Cardiologia',
-                crm: '12345'
-            };
-            
-            doctorsDB['67890'] = {
-                name: 'Dra. Maria Santos',
-                specialty: 'Clínica Geral',
-                crm: '67890'
-            };
+        const GITHUB_DB_URL = 'https://raw.githubusercontent.com/cirurgiaemergenci/Receita/main/medicationsDB.json';
 
-            // Medicamentos de exemplo
-            medicationsDB['para'] = {
-                name: 'Paracetamol',
-                concentration: '500mg',
-                dosage: '1 comprimido a cada 6 horas'
-            };
-            
-            medicationsDB['amox'] = {
-                name: 'Amoxicilina',
-                concentration: '875mg',
-                dosage: '1 comprimido a cada 12 horas'
-            };
-            
-            medicationsDB['dipl'] = {
-                name: 'Dipirona',
-                concentration: '500mg',
-                dosage: '1 comprimido a cada 8 horas'
-            };
-            
-            medicationsDB['ibup'] = {
-                name: 'Ibuprofeno',
-                concentration: '600mg',
-                dosage: '1 comprimido a cada 8 horas'
-            };
+        async function init() {
+            initializeDefaultDoctors();
+            updateDoctorDropdown();
+            loadLastUsedDoctor();
+            await loadMedicationsDatabase();
         }
 
-        // Salvar dados do médico
-        function saveDoctorData() {
-            const crm = document.getElementById('crm').value;
-            const name = document.getElementById('doctorName').value;
-            const specialty = document.getElementById('specialty').value;
-
-            if (crm && name && specialty) {
-                doctorsDB[crm] = { name, specialty, crm };
-                alert('Dados do médico salvos com sucesso!');
-                loadDoctorData(crm);
-            } else {
-                alert('Preencha todos os campos do médico!');
+        function initializeDefaultDoctors() {
+            if (Object.keys(doctorsDB).length === 0) {
+                doctorsDB['12345'] = { name: 'Dr. João Silva', specialty: 'Cardiologia', crm: '12345' };
+                doctorsDB['67890'] = { name: 'Dra. Maria Santos', specialty: 'Clínica Geral', crm: '67890' };
+                localStorage.setItem('doctorsDB', JSON.stringify(doctorsDB));
             }
         }
 
-        // Carregar médico por CRM
-        function loadDoctorByCRM() {
-            const crm = document.getElementById('crm').value;
-            if (crm && doctorsDB[crm]) {
-                loadDoctorData(crm);
-            } else {
-                alert('CRM não encontrado no banco de dados!');
+        async function loadMedicationsDatabase() {
+            try {
+                const response = await fetch(GITHUB_DB_URL);
+                if (response.ok) {
+                    medicationsDB = await response.json();
+                } else {
+                    console.warn('Falha ao obter dados do GitHub. Usando banco em memória vazio.');
+                }
+            } catch (error) {
+                console.error('Erro na requisição do JSON do GitHub:', error);
             }
         }
 
-        // Carregar dados do médico
-        function loadDoctorData(crm) {
+        function updateDoctorDropdown() {
+            const select = document.getElementById('doctorSelect');
+            select.innerHTML = '<option value="">Selecione um médico cadastrado...</option>';
+            
+            Object.keys(doctorsDB).forEach(crm => {
+                const doc = doctorsDB[crm];
+                const option = document.createElement('option');
+                option.value = crm;
+                option.textContent = `${doc.name} (${doc.specialty || 'Sem Especialidade'}) - CRM ${crm}`;
+                select.appendChild(option);
+            });
+        }
+
+        function loadLastUsedDoctor() {
+            const lastCRM = localStorage.getItem('lastUsedCRM');
+            if (lastCRM && doctorsDB[lastCRM]) {
+                fillDoctorFields(lastCRM);
+                document.getElementById('doctorSelect').value = lastCRM;
+            }
+        }
+
+        function fillDoctorFields(crm) {
             const doctor = doctorsDB[crm];
             if (doctor) {
+                document.getElementById('crm').value = doctor.crm;
                 document.getElementById('doctorName').value = doctor.name;
-                document.getElementById('specialty').value = doctor.specialty;
+                document.getElementById('specialty').value = doctor.specialty || '';
             }
         }
 
-        // Salvar dados do medicamento
-        function saveMedicationData() {
-            const principle = document.getElementById('activePrinciple').value.toLowerCase();
-            const concentration = document.getElementById('concentration').value;
-            const dosage = document.getElementById('standardDosage').value;
-
-            if (principle && concentration && dosage) {
-                const key = principle.substring(0, 4);
-                medicationsDB[key] = {
-                    name: document.getElementById('activePrinciple').value,
-                    concentration,
-                    dosage
-                };
-                alert('Medicamento salvo com sucesso!');
-                
-                // Limpar campos
-                document.getElementById('activePrinciple').value = '';
-                document.getElementById('concentration').value = '';
-                document.getElementById('standardDosage').value = '';
+        function selectDoctorFromDropdown(crm) {
+            if (crm && doctorsDB[crm]) {
+                fillDoctorFields(crm);
+                localStorage.setItem('lastUsedCRM', crm);
             } else {
-                alert('Preencha todos os campos do medicamento!');
+                document.getElementById('crm').value = '';
+                document.getElementById('doctorName').value = '';
+                document.getElementById('specialty').value = '';
             }
         }
 
-        // Buscar medicamentos
+        function autoLoadDoctorByCRM(crm) {
+            if (crm && doctorsDB[crm]) {
+                fillDoctorFields(crm);
+                document.getElementById('doctorSelect').value = crm;
+                localStorage.setItem('lastUsedCRM', crm);
+            }
+        }
+
+        function saveDoctorData() {
+            const crm = document.getElementById('crm').value.trim();
+            const name = document.getElementById('doctorName').value.trim();
+            const specialty = document.getElementById('specialty').value.trim();
+
+            if (crm && name) {
+                doctorsDB[crm] = { name, specialty, crm };
+                localStorage.setItem('doctorsDB', JSON.stringify(doctorsDB));
+                localStorage.setItem('lastUsedCRM', crm);
+                updateDoctorDropdown();
+                document.getElementById('doctorSelect').value = crm;
+                alert('Dados do médico salvos com sucesso!');
+            } else {
+                alert('Preencha pelo menos o CRM e o Nome do Médico!');
+            }
+        }
+
         function searchMedications(query) {
             const list = document.getElementById('medicationList');
             list.innerHTML = '';
             
-            if (query.length >= 4) {
-                const key = query.toLowerCase().substring(0, 4);
-                if (medicationsDB[key]) {
-                    const med = medicationsDB[key];
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.innerHTML = `${med.name} ${med.concentration}`;
-                    item.onclick = () => selectMedication(med);
-                    list.appendChild(item);
+            if (query.length >= 2) {
+                const q = query.toLowerCase();
+                const matchedKeys = Object.keys(medicationsDB).filter(key => 
+                    key.toLowerCase().includes(q) || 
+                    medicationsDB[key].name.toLowerCase().includes(q)
+                );
+
+                if (matchedKeys.length > 0) {
+                    matchedKeys.forEach(key => {
+                        const med = medicationsDB[key];
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.innerHTML = `<strong>${med.name}</strong> - ${med.concentration}`;
+                        item.onclick = () => selectMedication(med);
+                        list.appendChild(item);
+                    });
                     list.style.display = 'block';
                 } else {
                     list.style.display = 'none';
@@ -650,44 +630,22 @@
             }
         }
 
-        // Selecionar medicamento
         function selectMedication(med) {
             document.getElementById('searchMedication').value = `${med.name} ${med.concentration}`;
             document.getElementById('dosageInstructions').value = med.dosage;
             document.getElementById('medicationList').style.display = 'none';
-            calculateTotalPills();
         }
 
-        // Calcular total de comprimidos
-        function calculateTotalPills() {
-            const dosage = document.getElementById('dosageInstructions').value;
-            const days = parseInt(document.getElementById('treatmentDays').value) || 0;
-            
-            // Extrair número de comprimidos por dose (assumindo formato "X comprimido(s)")
-            const match = dosage.match(/(\d+)\s*comprimido/i);
-            if (match && days > 0) {
-                const pillsPerDose = parseInt(match[1]);
-                const dosesPerDay = dosage.includes('8 horas') ? 3 : 
-                                  dosage.includes('12 horas') ? 2 : 
-                                  dosage.includes('6 horas') ? 4 : 1;
-                
-                const totalPills = pillsPerDose * dosesPerDay * days;
-                // Você pode usar este valor para exibir o total
-            }
-        }
-
-        // Adicionar medicamento à lista
         function addMedication() {
             const use = document.getElementById('medicationUse').value;
             const medication = document.getElementById('searchMedication').value;
             const dosage = document.getElementById('dosageInstructions').value;
             const days = document.getElementById('treatmentDays').value;
 
-            if (medication && dosage && days) {
-                // Calcular total de comprimidos
+            if (medication && dosage) {
                 const match = dosage.match(/(\d+)\s*comprimido/i);
                 let totalPills = '';
-                if (match) {
+                if (match && days > 0) {
                     const pillsPerDose = parseInt(match[1]);
                     const dosesPerDay = dosage.includes('8 horas') ? 3 : 
                                       dosage.includes('12 horas') ? 2 : 
@@ -695,40 +653,31 @@
                     totalPills = pillsPerDose * dosesPerDay * parseInt(days);
                 }
 
-                const medicationObj = {
-                    use,
-                    medication,
-                    dosage,
-                    days,
-                    totalPills
-                };
-
+                const medicationObj = { use, medication, dosage, days, totalPills };
                 currentMedications.push(medicationObj);
                 
-                // Limpar campos
                 document.getElementById('searchMedication').value = '';
                 document.getElementById('dosageInstructions').value = '';
                 document.getElementById('treatmentDays').value = '';
                 
                 updateMedicationDisplay();
             } else {
-                alert('Preencha todos os campos da prescrição!');
+                alert('Preencha os campos obrigatórios da prescrição (Medicamento e Posologia)!');
             }
         }
 
-        // Atualizar exibição dos medicamentos
         function updateMedicationDisplay() {
             const list1 = document.getElementById('medicationList1');
             const list2 = document.getElementById('medicationList2');
             
             let html = '';
-            currentMedications.forEach((med, index) => {
+            currentMedications.forEach(med => {
                 html += `
                     <div class="medication">
                         <div class="medication-use">${med.use}</div>
                         <div class="medication-name">${med.medication} ${med.totalPills ? `- ${med.totalPills} comprimidos` : ''}</div>
                         <div class="medication-dosage">${med.dosage}</div>
-                        <div class="medication-dosage">${med.days} dias</div>
+                        ${med.days ? `<div class="medication-dosage">${med.days} dias</div>` : ''}
                     </div>
                 `;
             });
@@ -737,7 +686,6 @@
             list2.innerHTML = html;
         }
 
-        // Gerar receita
         function generatePrescription() {
             const doctorName = document.getElementById('doctorName').value;
             const crm = document.getElementById('crm').value;
@@ -745,50 +693,37 @@
             const patientName = document.getElementById('patientName').value;
             const patientAddress = document.getElementById('patientAddress').value;
 
-            if (!doctorName || !crm || !specialty) {
+            if (!doctorName || !crm) {
                 alert('Preencha os dados do médico!');
                 return;
             }
 
-            // Atualizar dados do médico
             ['1', '2'].forEach(via => {
                 document.getElementById(`displayDoctorName${via}`).textContent = doctorName;
                 document.getElementById(`displayCRM${via}`).textContent = crm;
-                document.getElementById(`displaySpecialty${via}`).textContent = specialty;
+                document.getElementById(`displaySpecialty${via}`).textContent = specialty || 'Geral';
                 document.getElementById(`footerDoctorName${via}`).textContent = doctorName;
                 document.getElementById(`footerCRM${via}`).textContent = crm;
-            });
-
-            // Atualizar dados do paciente
-            ['1', '2'].forEach(via => {
                 document.getElementById(`displayPatientName${via}`).textContent = patientName || '[Nome do Paciente]';
                 document.getElementById(`displayPatientAddress${via}`).textContent = patientAddress || '[Endereço]';
-            });
-
-            // Atualizar data
-            const today = new Date().toLocaleDateString('pt-BR');
-            ['1', '2'].forEach(via => {
-                document.getElementById(`displayDate${via}`).textContent = today;
+                document.getElementById(`displayDate${via}`).textContent = new Date().toLocaleDateString('pt-BR');
             });
 
             updateMedicationDisplay();
-            alert('Receita gerada com sucesso!');
+            alert('Receita atualizada com os dados do profissional e paciente!');
         }
 
-        // Imprimir receita
         function printPrescription() {
             window.print();
         }
 
-        // Inicializar dados padrão
-        initializeDefaultData();
-
-        // Fechar lista de autocomplete ao clicar fora
         document.addEventListener('click', function(e) {
             if (!e.target.closest('.autocomplete-container')) {
                 document.getElementById('medicationList').style.display = 'none';
             }
         });
+
+        init();
     </script>
 </body>
 </html>
