@@ -1,37 +1,252 @@
 {
-  "para": {
+  "para5": {
     "name": "Paracetamol",
-    "concentration": "500mg",
-    "dosage": "Tomar 1 comprimido a cada 6 horas"
+    "concentration": "500 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 6 horas se dor ou febre"
   },
-  "amox": {
-    "name": "Amoxicilina",
-    "concentration": "875mg",
-    "dosage": "Tomar 1 comprimido a cada 12 horas"
+  "para7": {
+    "name": "Paracetamol",
+    "concentration": "750 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 6 horas se dor ou febre"
   },
-  "dipi": {
+  "dipi5": {
     "name": "Dipirona",
-    "concentration": "500mg",
-    "dosage": "Tomar 1 comprimido a cada 6 horas"
+    "concentration": "500 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 6 horas se dor ou febre"
   },
-  "ibup": {
+  "dipi1": {
+    "name": "Dipirona",
+    "concentration": "1 g",
+    "dosage": "Tomar 1 comprimido via oral a cada 6 horas se dor ou febre"
+  },
+  "ibup6": {
     "name": "Ibuprofeno",
-    "concentration": "600mg",
-    "dosage": "Tomar 1 comprimido a cada 6 horas"
+    "concentration": "600 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 8 horas"
   },
-  "tans": {
-    "name": "Tansulosina ",
+  "ceto1": {
+    "name": "Cetoprofeno",
+    "concentration": "100 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 12 horas"
+  },
+  "ceto2": {
+    "name": "Cetoprofeno",
+    "concentration": "150 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "tora1": {
+    "name": "Trometamol Cetorolaco",
+    "concentration": "10 mg",
+    "dosage": "Tomar 1 comprimido sublingual a cada 8 horas se dor forte"
+  },
+  "tram5": {
+    "name": "Tramadol",
+    "concentration": "50 mg",
+    "dosage": "Tomar 1 cápsula via oral a cada 8 horas se dor intensa"
+  },
+  "paco": {
+    "name": "Paracetamol + Fosfato de Codeina",
+    "concentration": "500 mg + 30 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 8 horas se dor intensa"
+  },
+  "preg7": {
+    "name": "Pregabalina",
+    "concentration": "75 mg",
+    "dosage": "Tomar 1 cápsula via oral a noite"
+  },
+  "tans0": {
+    "name": "Tansulosina",
     "concentration": "0,4 mg",
-    "dosage": "Tomar 1 comprimido Via oral à noite"
+    "dosage": "Tomar 1 cápsula via oral a noite, apos o jantar"
   },
-  "piro": {
-    "name": "Piroxican",
+  "doxa2": {
+    "name": "Doxazosina",
+    "concentration": "2 mg",
+    "dosage": "Tomar 1 comprimido via oral a noite"
+  },
+  "doxa4": {
+    "name": "Doxazosina",
+    "concentration": "4 mg",
+    "dosage": "Tomar 1 comprimido via oral a noite"
+  },
+  "fina5": {
+    "name": "Finasterida",
+    "concentration": "5 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "duta0": {
+    "name": "Dutasterida",
+    "concentration": "0,5 mg",
+    "dosage": "Tomar 1 cápsula via oral ao dia"
+  },
+  "oxib5": {
+    "name": "Cloridrato de Oxibutinina",
+    "concentration": "5 mg",
+    "dosage": "Tomar 1 comprimido via oral de 12 em 12 horas"
+  },
+  "mira5": {
+    "name": "Mirabegrona",
+    "concentration": "50 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "sild5": {
+    "name": "Citrato de Sildenafila",
+    "concentration": "50 mg",
+    "dosage": "Tomar 1 comprimido via oral 1 hora antes da relacao sexual"
+  },
+  "tada5": {
+    "name": "Tadalafila",
+    "concentration": "5 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "tada2": {
+    "name": "Tadalafila",
     "concentration": "20 mg",
-    "dosage": "Tomar 1 Comprimido Ao dia após refeição "
+    "dosage": "Tomar 1 comprimido via oral antes da relacao sexual"
   },
-  "cipr": {
+  "cipr5": {
     "name": "Ciprofloxacino",
     "concentration": "500 mg",
-    "dosage": "Tomar 1 comprimido Via Oral de 12 em 12 horas"
+    "dosage": "Tomar 1 comprimido via oral a cada 12 horas"
+  },
+  "levo5": {
+    "name": "Levofloxacino",
+    "concentration": "500 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "nitr1": {
+    "name": "Nitrofurantoina",
+    "concentration": "100 mg",
+    "dosage": "Tomar 1 cápsula via oral a cada 6 horas"
+  },
+  "fosf3": {
+    "name": "Fosfomicina Trometamol",
+    "concentration": "3 g",
+    "dosage": "Diluir o conteudo do envelope em meio copo de agua e tomar em dose unica a noite, apos urinar"
+  },
+  "cefa5": {
+    "name": "Cefalexina",
+    "concentration": "500 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 6 horas"
+  },
+  "amox8": {
+    "name": "Amoxicilina",
+    "concentration": "875 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 12 horas"
+  },
+  "clav8": {
+    "name": "Amoxicilina + Clavulanato de Potassio",
+    "concentration": "875 mg + 125 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 12 horas"
+  },
+  "azit5": {
+    "name": "Azitromicina",
+    "concentration": "500 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "clin3": {
+    "name": "Clindamicina",
+    "concentration": "300 mg",
+    "dosage": "Tomar 1 cápsula via oral a cada 8 horas"
+  },
+  "bact1": {
+    "name": "Sulfametoxazol + Trimetoprima",
+    "concentration": "800 mg + 160 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 12 horas"
+  },
+  "onda4": {
+    "name": "Ondansetrona",
+    "concentration": "4 mg",
+    "dosage": "Tomar 1 comprimido sublingual a cada 8 horas se nauseas"
+  },
+  "onda8": {
+    "name": "Ondansetrona",
+    "concentration": "8 mg",
+    "dosage": "Tomar 1 comprimido sublingual a cada 8 horas se nauseas"
+  },
+  "meto1": {
+    "name": "Metoclopramida",
+    "concentration": "10 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 8 horas se nauseas"
+  },
+  "brom1": {
+    "name": "Bromoprida",
+    "concentration": "10 mg",
+    "dosage": "Tomar 1 cápsula via oral a cada 8 horas se nauseas"
+  },
+  "omep2": {
+    "name": "Omeprazol",
+    "concentration": "20 mg",
+    "dosage": "Tomar 1 cápsula via oral pela manha, em jejum"
+  },
+  "pant4": {
+    "name": "Pantoprazol",
+    "concentration": "40 mg",
+    "dosage": "Tomar 1 comprimido via oral pela manha, em jejum"
+  },
+  "busc1": {
+    "name": "Escopolamina",
+    "concentration": "10 mg",
+    "dosage": "Tomar 1 dragea via oral a cada 8 horas se colica"
+  },
+  "busc2": {
+    "name": "Escopolamina + Dipirona (Buscopan Composto)",
+    "concentration": "10 mg + 250 mg",
+    "dosage": "Tomar 1 dragea via oral a cada 6 horas se dor ou colica"
+  },
+  "sime4": {
+    "name": "Simeticona",
+    "concentration": "40 mg",
+    "dosage": "Tomar 1 comprimido via oral a cada 8 horas se distensao abdominal"
+  },
+  "dexa4": {
+    "name": "Dexametasona",
+    "concentration": "4 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "pred2": {
+    "name": "Prednisona",
+    "concentration": "20 mg",
+    "dosage": "Tomar 1 comprimido via oral pela manha"
+  },
+  "piro2": {
+    "name": "Piroxicam",
+    "concentration": "20 mg",
+    "dosage": "Tomar 1 comprimido ao dia, apos a refeicao"
+  },
+  "losar": {
+    "name": "Losartana Potassica",
+    "concentration": "50 mg",
+    "dosage": "Tomar 1 comprimido via oral de 12 em 12 horas"
+  },
+  "enal2": {
+    "name": "Enalapril",
+    "concentration": "20 mg",
+    "dosage": "Tomar 1 comprimido via oral de 12 em 12 horas"
+  },
+  "amlo5": {
+    "name": "Anlodipino",
+    "concentration": "5 mg",
+    "dosage": "Tomar 1 comprimido via oral ao dia"
+  },
+  "furo4": {
+    "name": "Furosemida",
+    "concentration": "40 mg",
+    "dosage": "Tomar 1 comprimido via oral pela manha"
+  },
+  "espi2": {
+    "name": "Espironolactona",
+    "concentration": "25 mg",
+    "dosage": "Tomar 1 comprimido via oral pela manha"
+  },
+  "hidr2": {
+    "name": "Hidroclorotiazida",
+    "concentration": "25 mg",
+    "dosage": "Tomar 1 comprimido via oral pela manha"
+  },
+  "pota1": {
+    "name": "Citrato de Potassio",
+    "concentration": "10 mEq",
+    "dosage": "Tomar 1 comprimido via oral a cada 12 horas"
   }
 }
