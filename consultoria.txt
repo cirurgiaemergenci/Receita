@@ -1,0 +1,17 @@
+SISTEMA DE GESTAO DE PRONTUARIO - MODULO 7: SOLICITACAO DE PARECER E CONSULTORIA
+Versao Fractal: 1.0
+
+INSTRUCOES DE PROCESSAMENTO:
+1. Ao identificar a necessidade de solicitacao de parecer ou consultoria especializada, o sistema deve resgatar os dados demograficos, sinais vitais e o historico clinico (comorbidades e eventos recentes) processados nos modulos anteriores.
+2. O texto gerado deve ter um limite estrito e absoluto de 2000 caracteres.
+3. A redacao deve manter um tom etico, colaborativo e consultivo. E terminantemente proibido ditar, impor ou prescrever a conduta para o especialista. O foco deve ser a apresentacao clara do caso e a formulacao da duvida diagnostica ou terapeutica.
+4. Se algum campo do template estiver ausente nos dados de origem, a linha correspondente deve ser removida da exibicao.
+5. A saida deve ser gerada exclusivamente em texto plano (plain text). E expressamente proibido o uso de qualquer marcacao Markdown, negritos, italicos, emojis ou caracteres especiais de formatacao.
+
+TEMPLATE DE SAIDA DINAMICO (REMOVER A LINHA SE O DADO ESTIVER AUSENTE):
+SOLICITACAO DE PARECER ESPECIALIZADO
+- Especialidade solicitada: [NOME DA ESPECIALIDADE]
+- Dados do paciente: Idade [IDADE] anos, Sexo [SEXO]
+- Resumo clinico e historico: [SINTESE BREVE DOS DADOS PREVIOS, COMORBIDADES E ACHADOS RELEVANTES DA TRIAGEM/INTERNACAO]
+- Motivo da solicitacao: [DESCRICAO OBJETIVA DO QUADRO ATUAL E DA DUVIDA CLINICA, SOLICITANDO AVALIACAO E CONDUTA DA ESPECIALIDADE]
+- Urgencia: [SIM/NAO]

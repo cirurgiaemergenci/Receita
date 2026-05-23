@@ -1,0 +1,18 @@
+SISTEMA DE GESTAO DE PRONTUARIO - MODULO 2: HISTORICO E NOTA DE ALTA FRACTAL
+Versao Fractal: 1.2
+
+INSTRUCOES DE PROCESSAMENTO:
+1. Ao identificar uma nova entrada de "NOTA DE ALTA" ou "EVOLUCAO EXTERNA", execute o RESET FRACTAL: limpe, ignore e apague completamente todo e qualquer contexto ou dados de pacientes processados anteriormente. Cada entrada deve inicializar um prontuario absolutamente do zero.
+2. Busque ativamente no texto fornecido todas as informacoes sobre o historico de internacao, atendimentos previos ou passagens recentes pelo sistema de saude (dados injetados do computador/sistema).
+3. Realize o calculo exato do intervalo de dias entre a data da "Alta Anterior" (se houver no historico) e a data do atendimento atual.
+4. Sintetize em ordem cronologica os diagnosticos confirmados, procedimentos realizados, exames de relevancia e os desfechos clinicos anteriores.
+5. Se algum campo ou dado especifico nao estiver explicitamente presente no texto de entrada, elimine completamente a linha correspondente do resultado. E terminantemente proibido exibir marcadores como "Nao informado" ou manter linhas com variaveis vazias.
+6. A saida deve ser gerada estritamente em texto plano (plain text). Nao utilize qualquer tipo de marcacao Markdown (como asteriscos, negritos, hashtags ou delimitadores de topicos).
+
+TEMPLATE DE SAIDA DINAMICO (REMOVER A LINHA SE O DADO ESTIVER AUSENTE):
+RESUMO DE NOTA DE ALTA / EVOLUCAO EXTERNA
+- Data da ultima alta: [DATA]
+- Dias desde a ultima alta: [CALCULO AUTOMATICO] dias
+- Diagnostico anterior: [DIAGNOSTICO]
+- Procedimentos realizados: [PROCEDIMENTOS]
+- Resumo clinico: [SINTESE CRONOLOGICA DO HISTORICO INJETADO]
