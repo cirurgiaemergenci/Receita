@@ -197,9 +197,9 @@
 
         <div class="form-row" style="margin-top: 20px; border-top: 2px solid #ccc; padding-top: 20px; display: flex; align-items: center;">
             <button class="btn" onclick="generatePrescription()" style="background: #2e7d32;">Visualizar Alterações</button>
-            <button class="btn btn-secondary" onclick="imprimir()">🖨️ Imprimir (Ctrl+P)</button>
+            <button class="btn btn-secondary" onclick="imprimir()">Imprimir (Ctrl+P)</button>
             
-            <button id="btnExportJSON" class="btn btn-warning" style="display: none; margin-left: auto;" onclick="downloadUpdatedJSON()">📥 Baixar medicationsDB.json Atualizado</button>
+            <button id="btnExportJSON" class="btn btn-warning" style="display: none; margin-left: auto;" onclick="downloadUpdatedJSON()">Baixar medicationsDB.json Atualizado</button>
         </div>
     </div>
 
@@ -208,8 +208,8 @@
     <script>
         const JSON_URL = 'https://raw.githubusercontent.com/cirurgiaemergenci/Receita/main/medicationsDB.json'; 
         
-        let originalJSONDict = {}; // Armazena a estrutura original do dicionário do GitHub
-        let medicationsDB = [];    // Array para facilitar as buscas no JS
+        let originalJSONDict = {}; 
+        let medicationsDB = [];    
         let currentMedications = [];
         let exportableNewMeds = []; 
 
@@ -221,17 +221,14 @@
         async function initApp() {
             const statusEl = document.getElementById('dbStatus');
             try {
-                // Timestamp na URL para evitar cache e pegar sempre a última versão
                 const response = await fetch(JSON_URL + '?t=' + new Date().getTime());
                 if (response.ok) {
                     const data = await response.json();
                     
-                    // Salva a estrutura de dicionário original para depois podermos baixar ela atualizada
                     if (!Array.isArray(data)) {
                         originalJSONDict = data;
                         medicationsDB = Object.values(data);
                     } else {
-                        // Caso você acidentalmente suba uma lista no GitHub, o código arruma para um dicionário
                         originalJSONDict = {};
                         data.forEach((med, i) => originalJSONDict['med'+i] = med);
                         medicationsDB = data;
@@ -276,7 +273,7 @@
                 } else {
                     const item = document.createElement('div');
                     item.className = 'autocomplete-item autocomplete-free';
-                    item.innerHTML = `<em>💡 Prescrição livre: <strong>${query}</strong></em>`;
+                    item.innerHTML = `<em>Prescrição livre: <strong>${query}</strong></em>`;
                     item.onclick = () => {
                         document.getElementById('searchMedication').value = query;
                         document.getElementById('medicationList').style.display = 'none';
@@ -324,17 +321,14 @@
             }
         }
 
-        // Função de Update e Download
         function downloadUpdatedJSON() {
             if (exportableNewMeds.length === 0) return;
 
-            // Insere os medicamentos novos no dicionário original perfeitamente formatados
             exportableNewMeds.forEach(med => {
                 let baseKey = med.name.substring(0, 4).toLowerCase().replace(/[^a-z]/g, '');
                 while(baseKey.length < 4) baseKey += 'x';
                 let uniqueKey = baseKey;
                 
-                // Garante que a chave de 4 letras não vá sobrescrever uma já existente
                 while(originalJSONDict[uniqueKey]) {
                     uniqueKey = baseKey + Math.floor(Math.random() * 1000);
                 }
@@ -346,21 +340,18 @@
                 };
             });
 
-            // Converte o dicionário final para JSON formatado (com espaçamento)
             const finalJSONString = JSON.stringify(originalJSONDict, null, 2);
 
-            // Cria um link temporário para forçar o download do arquivo
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(finalJSONString);
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
             downloadAnchorNode.setAttribute("download", "medicationsDB.json");
-            document.body.appendChild(downloadAnchorNode); // Necessário para o Firefox
+            document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
 
-            alert("✅ Arquivo medicationsDB.json baixado!\n\nAgora vá no seu GitHub, clique em 'Add file' -> 'Upload files' e arraste este arquivo baixado para atualizar sua biblioteca.");
+            alert("Arquivo medicationsDB.json baixado!\n\nAgora vá no seu GitHub, clique em 'Add file' -> 'Upload files' e arraste este arquivo baixado para atualizar sua biblioteca.");
             
-            // Limpa a lista temporária e esconde o botão
             exportableNewMeds = [];
             document.getElementById('btnExportJSON').style.display = 'none';
         }
@@ -381,33 +372,43 @@
             if (!dias) return null;
 
             let posLower = posologia.toLowerCase();
+            let nameLower = medName.toLowerCase();
+            
+            // Tratativa para soluções, gotas, xaropes, pomadas, etc.
+            if (nameLower.includes('ml') || nameLower.includes('solução') || nameLower.includes('solucao') || 
+                posLower.includes('gota') || posLower.includes('xarope') || posLower.includes('frasco')) {
+                let frascos = parseInt(dias) > 15 ? 2 : 1; 
+                return `${frascos} frasco(s)`;
+            }
+
+            if (nameLower.includes('pomada') || nameLower.includes('creme')) {
+                return `1 bisnaga`;
+            }
+
+            let unit = (nameLower.includes('ampola') || posLower.includes('ampola')) ? 'ampola(s)' : 'CP';
+            
             let dailyFreq = 1;
             let dosePerIntake = 1;
 
-            if (posLower.includes('24/24') || posLower.includes('1x') || posLower.includes('1 vez') || posLower.includes('ao dia')) dailyFreq = 1;
-            else if (posLower.includes('12/12') || posLower.includes('2x') || posLower.includes('2 vezes') || posLower.includes('duas vezes')) dailyFreq = 2;
-            else if (posLower.includes('8/8') || posLower.includes('3x') || posLower.includes('3 vezes')) dailyFreq = 3;
-            else if (posLower.includes('6/6') || posLower.includes('4x') || posLower.includes('4 vezes')) dailyFreq = 4;
-            else if (posLower.includes('4/4') || posLower.includes('6x')) dailyFreq = 6;
+            // Extração da frequência aprimorada (Pega 6/6, 6h, 6 em 6)
+            if (posLower.match(/24\/24|1x|1 vez|ao dia/)) dailyFreq = 1;
+            else if (posLower.match(/12\/12|12 em 12|12\s*h|2x|2 vezes|duas vezes/)) dailyFreq = 2;
+            else if (posLower.match(/8\/8|8 em 8|8\s*h|3x|3 vezes|três vezes/)) dailyFreq = 3;
+            else if (posLower.match(/6\/6|6 em 6|6\s*h|4x|4 vezes|quatro vezes/)) dailyFreq = 4;
+            else if (posLower.match(/4\/4|4 em 4|4\s*h|6x|6 vezes|seis vezes/)) dailyFreq = 6;
 
-            let doseMatch = posLower.match(/(\d+)\s*(comp|cp|cápsula|cap|ampola|frasco|gota|colher|ml)/);
+            // Extração da dose aprimorada (Pega 2 cp, 1/2 cp, "Tomar 2...")
+            let doseMatch = posLower.match(/(\d+)\s*(comp|cp|cápsula|cap|ampola)/);
             if (doseMatch) {
-                dosePerIntake = parseInt(doseMatch[1]);
+                dosePerIntake = parseFloat(doseMatch[1]);
+            } else if (posLower.match(/metade|1\/2|meio/)) {
+                dosePerIntake = 0.5;
+            } else {
+                let numMatch = posLower.match(/(?:tomar|ingerir|usar|aplicar)\s+(\d+)/);
+                if (numMatch) dosePerIntake = parseFloat(numMatch[1]);
             }
 
-            let total = dosePerIntake * dailyFreq * parseInt(dias);
-            let unit = 'CP';
-            let nameLower = medName.toLowerCase();
-            
-            if (nameLower.includes('ml') || posLower.includes('frasco') || posLower.includes('gota') || posLower.includes('xarope')) {
-                unit = 'frasco(s)';
-                total = total > 100 ? 2 : 1; 
-            } else if (nameLower.includes('ampola') || posLower.includes('ampola')) {
-                unit = 'ampola(s)';
-            } else if (nameLower.includes('pomada') || nameLower.includes('creme')) {
-                unit = 'bisnaga(s)';
-                total = 1;
-            }
+            let total = Math.ceil(dosePerIntake * dailyFreq * parseInt(dias));
 
             return `${total} ${unit}`;
         }
@@ -426,11 +427,11 @@
                 if (med.dias) {
                     finalQtdText = calculateTotalQuantity(med.posologia, med.dias, med.name);
                 } else {
-                    let unit = 'CP';
                     let nameLower = med.name.toLowerCase();
-                    if (nameLower.includes('ml')) unit = 'frasco(s)';
-                    else if (nameLower.includes('ampola')) unit = 'ampola(s)';
-                    finalQtdText = unit;
+                    if (nameLower.includes('ml') || nameLower.includes('solução') || nameLower.includes('gota')) finalQtdText = 'frasco(s)';
+                    else if (nameLower.includes('ampola')) finalQtdText = 'ampola(s)';
+                    else if (nameLower.includes('pomada') || nameLower.includes('creme')) finalQtdText = 'bisnaga(s)';
+                    else finalQtdText = 'CP';
                 }
                 
                 html += `
